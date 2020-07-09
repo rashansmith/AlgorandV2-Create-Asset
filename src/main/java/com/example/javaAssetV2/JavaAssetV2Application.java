@@ -7,28 +7,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
-/*import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.Encoder;*/
-import com.algorand.algosdk.v2.*;
+import com.algorand.algosdk.util.Encoder;
+
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.RawTransaction;
-import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
-//import com.algorand.algosdk.v2.client.model.Account;
-import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
-import com.algorand.algosdk.transaction.SignedTransaction;
-//import com.algorand.algosdk.v2.client.model.Transaction;
-import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
-import com.example.javaAssetV2.CreateAssetTutorial.ChangingBlockParms;
-import com.algorand.algosdk.util.Encoder;
+
+;
 
 @SpringBootApplication
 public class JavaAssetV2Application {
@@ -56,7 +47,8 @@ public class JavaAssetV2Application {
 			public Long firstRound;
 			public Long lastRound;
 			public String genID;
-			public Digest genHash;
+			public byte[] genHash;
+			
 
 			public ChangingBlockParms() {
 				this.fee = Long.valueOf(0);
@@ -94,17 +86,13 @@ public class JavaAssetV2Application {
 		public ChangingBlockParms getChangingParms(AlgodClient client) throws Exception {
 			ChangingBlockParms cp = new JavaAssetV2Application.ChangingBlockParms();
 				TransactionParametersResponse params = client.TransactionParams().execute().body();
-				//String genesisId = params.execute().body().genesisId;
-				//Digest genesisHash =new Digest(params.execute().body().genesisId.getBytes());
-				//Long currFee = params.execute().body().fee;
 				cp.lastRound = Long.sum(cp.firstRound.longValue(), Long.valueOf(1000));
 				System.out.println(cp.lastRound);
 				cp.genID = params.genesisId;
 				System.out.println(cp.genID);
 				System.out.println(params.genesisId.getBytes());
-				cp.genHash = new Digest(params.genesisId.getBytes());
-				cp.fee = params.fee;
-				//cp.firstRound = params.execute().body().lastRound;
+				cp.genHash = params.genesisId.getBytes();
+				cp.fee = params.fee;;
 	
 			return (cp);
 		}
@@ -181,11 +169,15 @@ public class JavaAssetV2Application {
 			// into tenths, and so on. This value must be between 0 and 19
 
 			Integer decimals = 0;
-			Transaction tx = Transaction.AssetCreateTransactionBuilder().sender(acct1.getAddress()).fee(0)
-					.lastValid(cp.lastRound).genesisHash(cp.genHash).assetTotal(assetTotal)
+			Transaction tx = 
+					Transaction.AssetCreateTransactionBuilder().sender(acct1.getAddress()).fee(0)
+					.lastValid(cp.lastRound)
+					.genesisHash(cp.genHash)
+					.assetTotal(assetTotal)
 					.assetDecimals(decimals).assetUnitName(unitName).assetName(assetName).url(url)
 					.metadataHashUTF8(assetMetadataHash).manager(manager).reserve(reserve).freeze(freeze)
 					.defaultFrozen(defaultFrozen).clawback(clawback).build();
+
 			// Update the fee as per what the BlockChain is suggesting
 			
 			Account.setFeeByFeePerByte(tx, cp.fee.intValue());
