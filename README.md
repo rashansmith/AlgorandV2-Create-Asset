@@ -13,5 +13,9 @@ Error:
 ```
   
  This line: ```client.TransactionParams().execute().body().genesisId``` currently returns 12 bytes[], but Digest seems to be expecting 32 bytes[]?
+ 
+ 
+ Link to Algorand Java SDK Digest code: https://github.com/algorand/java-algorand-sdk/blob/develop/src/main/java/com/algorand/algosdk/crypto/Digest.java
+ Link to my code implementing Digest: https://github.com/rashansmith/AlgorandV2-Create-Asset/blob/master/src/main/java/com/example/javaAssetV2/JavaAssetV2Application.java
   
 
